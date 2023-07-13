@@ -16,7 +16,7 @@
             copyInput.select();
             document.execCommand("Copy");
             document.body.removeChild(copyInput);
-            layer.msg('复制成功！');
+            layer.msg('复制成功！', {offset: 't5'});
             if (isInput) {
                 window.cinput.focus();
             }
