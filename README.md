@@ -2,7 +2,7 @@
 
 本仓库forked自[https://github.com/manakanemu/ctoj](https://github.com/manakanemu/ctoj)。
 
-原版网页的字典过小，这里使用了来自[https://github.com/NoHeartPen/Kanji2Hanzi](https://github.com/NoHeartPen/Kanji2Hanzi)的汉字字典，并修复了一点bug。
+原转换器年久失修，本仓库修复了一点bug。
 
 ## 网站介绍
 
