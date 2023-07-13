@@ -6,6 +6,8 @@
     <title>中日汉字转换改</title>
     <link rel="icon" href="" type="image/x-icon" />
     <script src='loadDictionary.js'></script>
+    <script src="https://CDN.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/layer/3.5.1/layer.js"></script>
     <script>
         function copy(str, isInput, ori) {
             var copyInput = document.createElement('input');
@@ -14,7 +16,7 @@
             copyInput.select();
             document.execCommand("Copy");
             document.body.removeChild(copyInput);
-
+            layer.msg('复制成功！');
             if (isInput) {
                 window.cinput.focus();
             }
@@ -100,44 +102,6 @@
 
         input:hover {
             border: 1px solid gray;
-        }
-
-        .tooltip {
-            position: relative;
-            display: inline-block;
-        }
-
-        .tooltip .tooltiptext {
-            visibility: hidden;
-            width: 140px;
-            background-color: #555;
-            color: #fff;
-            text-align: center;
-            border-radius: 6px;
-            padding: 5px;
-            position: absolute;
-            z-index: 1;
-            bottom: 150%;
-            left: 50%;
-            margin-left: -75px;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .tooltip .tooltiptext::after {
-            content: "";
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            margin-left: -5px;
-            border-width: 5px;
-            border-style: solid;
-            border-color: #555 transparent transparent transparent;
-        }
-
-        .tooltip:hover .tooltiptext {
-            visibility: visible;
-            opacity: 1;
         }
     </style>
 </head>
