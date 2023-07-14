@@ -16,7 +16,12 @@
             copyInput.select();
             document.execCommand("Copy");
             document.body.removeChild(copyInput);
-            layer.msg('复制成功！', {offset: 't5'});
+            if (str.length == 0) {
+                layer.msg('复制内容为空', { offset: 't5' });
+            }
+            else {
+                layer.msg('复制成功！', { offset: 't5' });
+            }
             if (isInput) {
                 window.cinput.focus();
             }
@@ -24,9 +29,22 @@
         }
         function trans(ori) {
             var words = window.cinput.value.split('')
+            var hexList = new Array();
             for (i = 0; i < words.length; i++) {
                 if (window.dictionary[words[i]]) {
+                    const character = window.dictionary[words[i]]; // 获取字符
+
                     words.splice(i, 1, window.dictionary[words[i]]);
+
+                    const unicode = character.charCodeAt(0);
+                    const hex = "u" + unicode.toString(16).padStart(4, '0').toUpperCase();
+                    hexList.push(hex)
+                }
+                else {
+                    const character = words[i]; // 获取字符
+                    const unicode = character.charCodeAt(0);
+                    const hex = "u" + unicode.toString(16).padStart(4, '0').toUpperCase();
+                    hexList.push(hex)
                 }
             }
             words = words.join('');
@@ -103,6 +121,12 @@
         input:hover {
             border: 1px solid gray;
         }
+        .kanji-list {
+            position: absolute;
+            left: 50%;
+            top: 70%;
+            transform: translate(-50%, -50%);
+        }
     </style>
 </head>
 
@@ -164,6 +188,8 @@
             <div style="position: relative;">
                 <input id='japanese' type="text" placeholder="点击翻译结果即可复制" readonly='' style="cursor:pointer;">
             </div>
+        </div>
+        <div class="kanji-list">
         </div>
     </div>
 
