@@ -38,18 +38,31 @@
 
                     const unicode = character.charCodeAt(0);
                     const hex = "u" + unicode.toString(16).padStart(4, '0').toUpperCase();
-                    hexList.push(hex)
+                    hexList.push({
+                            hex16 : hex,
+                            kanji : window.dictionary[words[i]]
+                        })
                 }
                 else {
                     const character = words[i]; // 获取字符
                     const unicode = character.charCodeAt(0);
                     const hex = "u" + unicode.toString(16).padStart(4, '0').toUpperCase();
-                    hexList.push(hex)
+                    hexList.push({
+                            hex16 : hex,
+                            kanji : character
+                        })
                 }
             }
             words = words.join('');
             window.jinput.value = words;
+            
 
+            let kanjiDomList = new Array();
+            for (j = 0; j < hexList.length; j++) {
+                kanjiDomList.push(`<a href="https://kanji.sljfaq.org/k/${hexList[j].hex16}.html">${hexList[j].kanji}</a>`)
+            }
+            kanjiListStr = kanjiDomList.join('  ');
+            document.getElementById('kanjiList').innerHTML = kanjiListStr;
         }
         window.onload = function () {
             window.cinput = document.getElementById('chinese');
@@ -127,6 +140,11 @@
             top: 70%;
             transform: translate(-50%, -50%);
         }
+
+        .kanji-list a {
+            font-size: 1.4em;
+            text-decoration: none;
+        }
     </style>
 </head>
 
@@ -189,7 +207,8 @@
                 <input id='japanese' type="text" placeholder="点击翻译结果即可复制" readonly='' style="cursor:pointer;">
             </div>
         </div>
-        <div class="kanji-list">
+        <div class="kanji-list" id="kanjiList">
+            <p></p>
         </div>
     </div>
 
