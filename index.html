@@ -32,9 +32,9 @@
             var hexList = new Array();
             for (i = 0; i < words.length; i++) {
                 if (window.dictionary[words[i]]) {
-                    const character = window.dictionary[words[i]]; // 获取字符
+                    const character = window.dictionary[words[i]][0]; // 获取字符
 
-                    words.splice(i, 1, window.dictionary[words[i]]);
+                    words.splice(i, 1, window.dictionary[words[i]][0]);
 
                     const unicode = character.charCodeAt(0);
                     const hex = "u" + unicode.toString(16).padStart(4, '0').toUpperCase();
