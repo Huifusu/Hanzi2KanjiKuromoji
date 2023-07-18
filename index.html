@@ -40,7 +40,7 @@
                     const hex = "u" + unicode.toString(16).padStart(4, '0').toUpperCase();
                     hexList.push({
                             hex16 : hex,
-                            kanji : window.dictionary[words[i]]
+                            kanji : character
                         })
                 }
                 else {
@@ -55,7 +55,7 @@
             }
             words = words.join('');
             window.jinput.value = words;
-            
+
 
             let kanjiDomList = new Array();
             for (j = 0; j < hexList.length; j++) {
@@ -106,11 +106,12 @@
         }
 
         .title-box {
-            margin-top: 100px;
+            margin-top: 70px;
             position: absolute;
             left: 50%;
-            transform: translateX(-50%);
-            z-index: 1;
+            top: 20%;
+            transform: translate(-50%, -50%)
+
 
         }
 
@@ -131,6 +132,14 @@
             box-sizing: border-box;
         }
 
+        #japanese {
+            font-family: Noto Sans JP,Noto Sans SC,Noto Sans TC,sans-serif;
+        }
+
+        #chinese {
+            font-family: Noto Sans SC,Noto Sans JP,Noto Sans TC,sans-serif;
+        }
+
         input:hover {
             border: 1px solid gray;
         }
@@ -142,7 +151,7 @@
         }
 
         .kanji-list a {
-            font-size: 1.4em;
+            font-size: 1.5em;
             text-decoration: none;
         }
     </style>
@@ -200,14 +209,14 @@
         </div>
 
         <div class='input-box'>
-            <div>
+            <div lang="zh-Hans">
                 <input id='chinese' type="text" placeholder="请输入中文">
             </div>
-            <div style="position: relative;">
-                <input id='japanese' type="text" placeholder="点击翻译结果即可复制" readonly='' style="cursor:pointer;">
+            <div style="position: relative;"  lang="ja">
+                <input id='japanese' type="text" placeholder="コピーするにはクリック" readonly='' style="cursor:pointer;">
             </div>
         </div>
-        <div class="kanji-list" id="kanjiList">
+        <div class="kanji-list" id="kanjiList" lang="ja">
             <p></p>
         </div>
     </div>
