@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 
 <head>
@@ -31,7 +31,18 @@
             var words = window.cinput.value.split('')
             var hexList = new Array();
             for (i = 0; i < words.length; i++) {
-                if (window.dictionary[words[i]]) {
+                if (window.shiftjis1List.indexOf(words[i]) > -1) {
+                    const character = words[i];
+
+                    const unicode = character.charCodeAt(0);
+                    const hex = "u" + unicode.toString(16).padStart(4, '0').toUpperCase();
+                    hexList.push({
+                        hex16: hex,
+                        kanji: character,
+                        type: "intrans"
+                    })
+                }
+                else if (window.dictionary[words[i]]) {
                     const character = window.dictionary[words[i]][0]; // 获取字符
 
                     words.splice(i, 1, window.dictionary[words[i]][0]);
@@ -39,8 +50,9 @@
                     const unicode = character.charCodeAt(0);
                     const hex = "u" + unicode.toString(16).padStart(4, '0').toUpperCase();
                     hexList.push({
-                            hex16 : hex,
-                            kanji : character
+                           hex16 : hex,
+                           kanji: character,
+                           type: "trans" 
                         })
                 }
                 else {
@@ -49,7 +61,8 @@
                     const hex = "u" + unicode.toString(16).padStart(4, '0').toUpperCase();
                     hexList.push({
                             hex16 : hex,
-                            kanji : character
+                            kanji: character,
+                            type: "org"
                         })
                 }
             }
@@ -59,7 +72,7 @@
 
             let kanjiDomList = new Array();
             for (j = 0; j < hexList.length; j++) {
-                kanjiDomList.push(`<a href="https://kanji.sljfaq.org/k/${hexList[j].hex16}.html">${hexList[j].kanji}</a>`)
+                kanjiDomList.push(`<a class="${hexList[j].type}" href="https://kanji.sljfaq.org/k/${hexList[j].hex16}.html">${hexList[j].kanji}</a>`)
             }
             kanjiListStr = kanjiDomList.join('  ');
             document.getElementById('kanjiList').innerHTML = kanjiListStr;
@@ -150,10 +163,21 @@
             transform: translate(-50%, -50%);
         }
 
-        .kanji-list a {
+        .kanji-list .trans {
             font-size: 1.5em;
             text-decoration: none;
         }
+
+        .kanji-list .intrans {
+            color : black;
+            font-size: 1.5em;
+            text-decoration: none;
+            }
+        .kanji-list .org {
+                color: grey;
+                font-size: 1.5em;
+                text-decoration: none;
+            }
     </style>
 </head>
 
