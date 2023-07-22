@@ -32,38 +32,82 @@
             var hexList = new Array();
             for (i = 0; i < words.length; i++) {
                 if (window.shiftjis1List.indexOf(words[i]) > -1) {
-                    const character = words[i];
+                    // 已存在shiftjis第一梯队的汉字
+                    // 黑色汉字
+                    if (window.dictionary[words[i]] && window.dictionary[words[i]].length > 1) {
+                        
+                        // 含有多个对应汉字，在后面进行处理
+                        
+                        const character = window.dictionary[words[i]][0];
+                        const unicode = character.charCodeAt(0);
+                        const hex = "u" + unicode.toString(16).padStart(4, '0').toUpperCase();
+                        
+                        hexList.push({
+                            hex16: hex,
+                            kanji: character,
+                            type: "trans", // 以trans方法进行处理，不影响后面颜色
+                            all: window.dictionary[words[i]],
+                            orgkanji: words[i]
+                        })
+                        words.splice(i, 1, character);
+                    }
+                    else {
+                        const character = words[i];
+                        const unicode = character.charCodeAt(0);
+                        const hex = "u" + unicode.toString(16).padStart(4, '0').toUpperCase();
+                        hexList.push({
+                            hex16: hex,
+                            kanji: character,
+                            type: "intrans"
+                        })
+                    }
+                }
+                else if (window.dictionary[words[i]]) {
+                    // shiftjis第一梯队转换的文字
+                    // 蓝色汉字
+                    if (window.dictionary[words[i]].length > 1) {
+                        const character = window.dictionary[words[i]][0]; 
+                        // 有多个对应的汉字
 
+                    
+                        const unicode = character.charCodeAt(0);
+                        const hex = "u" + unicode.toString(16).padStart(4, '0').toUpperCase();
+
+                        hexList.push({
+                            hex16: hex,
+                            kanji: character,
+                            type: "trans",
+                            all: window.dictionary[words[i]],
+                            orgkanji: words[i]
+                        })
+                        words.splice(i, 1, window.dictionary[words[i]][0]);
+                    }
+                    else {
+                        const character = window.dictionary[words[i]][0]; 
+                        // 没有多个
+
+                        const unicode = character.charCodeAt(0);
+                        const hex = "u" + unicode.toString(16).padStart(4, '0').toUpperCase();
+
+                        hexList.push({
+                            hex16: hex,
+                            kanji: character,
+                            type: "trans"
+                        })
+                        words.splice(i, 1, window.dictionary[words[i]][0]);
+                    }
+                }
+                else {
+                    // 未找到的汉字？字符？
+                    // 灰色汉字
+                    const character = words[i]; // 获取字符
                     const unicode = character.charCodeAt(0);
                     const hex = "u" + unicode.toString(16).padStart(4, '0').toUpperCase();
                     hexList.push({
                         hex16: hex,
                         kanji: character,
-                        type: "intrans"
+                        type: "org"
                     })
-                }
-                else if (window.dictionary[words[i]]) {
-                    const character = window.dictionary[words[i]][0]; // 获取字符
-
-                    words.splice(i, 1, window.dictionary[words[i]][0]);
-
-                    const unicode = character.charCodeAt(0);
-                    const hex = "u" + unicode.toString(16).padStart(4, '0').toUpperCase();
-                    hexList.push({
-                           hex16 : hex,
-                           kanji: character,
-                           type: "trans" 
-                        })
-                }
-                else {
-                    const character = words[i]; // 获取字符
-                    const unicode = character.charCodeAt(0);
-                    const hex = "u" + unicode.toString(16).padStart(4, '0').toUpperCase();
-                    hexList.push({
-                            hex16 : hex,
-                            kanji: character,
-                            type: "org"
-                        })
                 }
             }
             words = words.join('');
@@ -72,7 +116,26 @@
 
             let kanjiDomList = new Array();
             for (j = 0; j < hexList.length; j++) {
-                kanjiDomList.push(`<a class="${hexList[j].type}" href="https://kanji.sljfaq.org/k/${hexList[j].hex16}.html">${hexList[j].kanji}</a>`)
+                if (hexList[j].all) {
+                    let domAll = new Array();
+                    for (k = 0; k < hexList[j].all.length; k++) {
+                        let scharacter = hexList[j].all[k];
+                        let sunicode = scharacter.charCodeAt(0);
+                        let shex = "u" + sunicode.toString(16).padStart(4, '0').toUpperCase();
+                        if (scharacter == hexList[j].orgkanji) {
+                            domAll.push(`<a class="intrans" href="https://kanji.sljfaq.org/k/${shex}.html">${hexList[j].all[k]}</a>`)
+                        }
+                        else {
+                            domAll.push(`<a class="trans" href="https://kanji.sljfaq.org/k/${shex}.html">${hexList[j].all[k]}</a>`)
+                        }
+
+                    }
+                    domStr = domAll.join('/');
+                    kanjiDomList.push(domStr)
+                }
+                else {
+                    kanjiDomList.push(`<a class="${hexList[j].type}" href="https://kanji.sljfaq.org/k/${hexList[j].hex16}.html">${hexList[j].kanji}</a>`)
+                }
             }
             kanjiListStr = kanjiDomList.join('  ');
             document.getElementById('kanjiList').innerHTML = kanjiListStr;
@@ -124,8 +187,6 @@
             left: 50%;
             top: 20%;
             transform: translate(-50%, -50%)
-
-
         }
 
         .input-box {
@@ -146,16 +207,17 @@
         }
 
         #japanese {
-            font-family: Noto Sans JP,Noto Sans SC,Noto Sans TC,sans-serif;
+            font-family: Noto Sans JP, Noto Sans SC, Noto Sans TC, sans-serif;
         }
 
         #chinese {
-            font-family: Noto Sans SC,Noto Sans JP,Noto Sans TC,sans-serif;
+            font-family: Noto Sans SC, Noto Sans JP, Noto Sans TC, sans-serif;
         }
 
         input:hover {
             border: 1px solid gray;
         }
+
         .kanji-list {
             position: absolute;
             left: 50%;
@@ -168,16 +230,22 @@
             text-decoration: none;
         }
 
+        .kanji-list .trans:visited {
+            color: blue;
+            /* 已访问的链接颜色也为蓝色 */
+        }
+
         .kanji-list .intrans {
-            color : black;
+            color: black;
             font-size: 1.5em;
             text-decoration: none;
-            }
+        }
+
         .kanji-list .org {
-                color: grey;
-                font-size: 1.5em;
-                text-decoration: none;
-            }
+            color: grey;
+            font-size: 1.5em;
+            text-decoration: none;
+        }
     </style>
 </head>
 
@@ -236,7 +304,7 @@
             <div lang="zh-Hans">
                 <input id='chinese' type="text" placeholder="请输入中文">
             </div>
-            <div style="position: relative;"  lang="ja">
+            <div style="position: relative;" lang="ja">
                 <input id='japanese' type="text" placeholder="コピーするにはクリック" readonly='' style="cursor:pointer;">
             </div>
         </div>
