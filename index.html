@@ -137,7 +137,7 @@
                     kanjiDomList.push(`<a class="${hexList[j].type}" href="https://kanji.sljfaq.org/k/${hexList[j].hex16}.html">${hexList[j].kanji}</a>`)
                 }
             }
-            kanjiListStr = kanjiDomList.join('  ');
+            kanjiListStr = kanjiDomList.join('    ');
             document.getElementById('kanjiList').innerHTML = kanjiListStr;
         }
         window.onload = function () {
@@ -245,6 +245,11 @@
             color: grey;
             font-size: 1.5em;
             text-decoration: none;
+        }
+
+        .kanji-list a:hover {
+            /* 下划线 */
+            text-decoration:underline;
         }
     </style>
 </head>
