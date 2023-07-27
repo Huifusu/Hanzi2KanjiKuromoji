@@ -185,7 +185,6 @@
 
             // Kuromoji处理
             var kuromojiPath = tokenizer.tokenize(words);
-            console.log(kuromojiPath)
             var kuromojiDomList = new Array();
             for (l = 0; l < kuromojiPath.length; l++) {
                 if (kuromojiPath[l].pos_detail_1 == "空白") {
