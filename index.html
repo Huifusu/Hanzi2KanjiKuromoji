@@ -3,19 +3,41 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>中日汉字转换改</title>
+    <title>中日汉字转换分析Kuromoji</title>
     <link rel="icon" href="" type="image/x-icon" />
     <script src='loadDictionary.js'></script>
     <script src="https://CDN.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.bootcdn.net/ajax/libs/layer/3.5.1/layer.js"></script>
     <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-WP9NXG47');</script>
+    <script>(function (w, d, s, l, i) {
+            w[l] = w[l] || []; w[l].push({
+                'gtm.start':
+                    new Date().getTime(), event: 'gtm.js'
+            }); var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-WP9NXG47');</script>
     <!-- End Google Tag Manager -->
+    <script src="kuromoji/build/kuromoji.js"></script>
+
+    <!-- Js -->
     <script>
+        // Kuromoji字典初始化
+        var DIC_URL = "kuromoji/dict/";
+
+        var tokenizer = null;
+
+        kuromoji.builder({ dicPath: DIC_URL }).build(function (error, _tokenizer) {
+            if (error != null) {
+                console.log(error);
+            }
+            tokenizer = _tokenizer;
+
+            //加载完成
+            document.getElementById('kuromojiList').innerHTML = "<p></p>";
+
+        });
+
         function copy(str, isInput, ori) {
             var copyInput = document.createElement('input');
             document.body.appendChild(copyInput);
@@ -34,6 +56,8 @@
             }
 
         }
+
+        // 汉字处理过程
         function trans(ori) {
             var words = window.cinput.value.split('')
             var hexList = new Array();
@@ -45,13 +69,13 @@
                     // 已存在shiftjis第一梯队的汉字
                     // 黑色汉字
                     if (window.dictionary[words[i]] && window.dictionary[words[i]].length > 1) {
-                        
+
                         // 含有多个对应汉字，在后面进行处理
-                        
+
                         const character = window.dictionary[words[i]][0];
                         const unicode = character.charCodeAt(0);
                         const hex = "u" + unicode.toString(16).padStart(4, '0').toUpperCase();
-                        
+
                         hexList.push({
                             hex16: hex,
                             kanji: character,
@@ -76,10 +100,10 @@
                     // shiftjis第一梯队转换的文字
                     // 蓝色汉字
                     if (window.dictionary[words[i]].length > 1) {
-                        const character = window.dictionary[words[i]][0]; 
+                        const character = window.dictionary[words[i]][0];
                         // 有多个对应的汉字
 
-                    
+
                         const unicode = character.charCodeAt(0);
                         const hex = "u" + unicode.toString(16).padStart(4, '0').toUpperCase();
 
@@ -93,7 +117,7 @@
                         words.splice(i, 1, window.dictionary[words[i]][0]);
                     }
                     else {
-                        const character = window.dictionary[words[i]][0]; 
+                        const character = window.dictionary[words[i]][0];
                         // 没有多个
 
                         const unicode = character.charCodeAt(0);
@@ -123,7 +147,7 @@
             words = words.join('');
             window.jinput.value = words;
 
-
+            // 生成汉字列表
             let kanjiDomList = new Array();
             for (j = 0; j < hexList.length; j++) {
                 if (hexList[j].all) {
@@ -149,7 +173,30 @@
             }
             kanjiListStr = kanjiDomList.join('    ');
             document.getElementById('kanjiList').innerHTML = kanjiListStr;
+
+
+            // Kuromoji处理
+            var kuromojiPath = tokenizer.tokenize(words);
+            console.log(kuromojiPath)
+            var kuromojiDomList = new Array();
+            for (l = 0; l < kuromojiPath.length; l++) {
+                if (kuromojiPath[l].reading) {
+                    kuromojiDomList.push(`<ruby class="known">${kuromojiPath[l].surface_form} <rt>${kuromojiPath[l].reading}</rt></ruby>`)
+                }
+                else {
+                    kuromojiDomList.push(`<ruby class="unknown">${kuromojiPath[l].surface_form} <rt></rt></ruby>`)
+                }
+            }
+            kuromojiListStr = kuromojiDomList.join('');
+            // kuromojiListStr = "<ruby>" + kuromojiDomList.join(''); + "</ruby>"
+            document.getElementById('kuromojiList').innerHTML = kuromojiListStr;
+
         }
+
+
+
+
+
         window.onload = function () {
             window.cinput = document.getElementById('chinese');
             window.jinput = document.getElementById('japanese');
@@ -195,14 +242,14 @@
             margin-top: 70px;
             position: absolute;
             left: 50%;
-            top: 20%;
+            top: 15%;
             transform: translate(-50%, -50%)
         }
 
         .input-box {
             position: absolute;
             left: 50%;
-            top: 50%;
+            top: 45%;
             transform: translate(-50%, -50%)
         }
 
@@ -231,7 +278,7 @@
         .kanji-list {
             position: absolute;
             left: 50%;
-            top: 70%;
+            top: 65%;
             transform: translate(-50%, -50%);
         }
 
@@ -259,7 +306,29 @@
 
         .kanji-list a:hover {
             /* 下划线 */
-            text-decoration:underline;
+            text-decoration: underline;
+        }
+
+        .kuromoji-list {
+            position: absolute;
+            left: 50%;
+            top: 75%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5em;
+        }
+
+        .kuromoji-list p {
+            font-size: 0.9em;
+        }
+
+        ruby {
+            margin: 15px;
+            position: relative;
+            
+        }
+
+        .unknown {
+            color: grey;
         }
     </style>
 </head>
@@ -312,7 +381,7 @@
             }
         </style>
         <div class='title-box'>
-            <h1>中日汉字转换改</h1>
+            <h1>中日汉字转换分析</h1>
         </div>
 
         <div class='input-box'>
@@ -326,11 +395,15 @@
         <div class="kanji-list" id="kanjiList" lang="ja">
             <p></p>
         </div>
+        <div class="kuromoji-list" id="kuromojiList" lang="ja">
+            <p>Kuromoji字典加载中...</p>
+        </div>
     </div>
 
 </body>
 <!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WP9NXG47"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WP9NXG47" height="0" width="0"
+        style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
+
 </html>
