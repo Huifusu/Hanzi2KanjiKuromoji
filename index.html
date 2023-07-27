@@ -3,7 +3,7 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>中日汉字转换分析Kuromoji</title>
+    <title>中日汉字转换・分析 Kuromoji</title>
     <link rel="icon" href="" type="image/x-icon" />
     <script src='loadDictionary.js'></script>
     <script src="https://CDN.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -37,6 +37,14 @@
             document.getElementById('kuromojiList').innerHTML = "<p></p>";
 
         });
+
+        // 片假转平假
+        function katakanaToHiragana(katakanaText) {
+            return katakanaText
+                .split("")
+                .map((char) => window.katakanaToHiraganaMap[char] || char)
+                .join("");
+        }
 
         function copy(str, isInput, ori) {
             var copyInput = document.createElement('input');
@@ -180,11 +188,14 @@
             console.log(kuromojiPath)
             var kuromojiDomList = new Array();
             for (l = 0; l < kuromojiPath.length; l++) {
-                if (kuromojiPath[l].reading) {
-                    kuromojiDomList.push(`<ruby class="known">${kuromojiPath[l].surface_form} <rt>${kuromojiPath[l].reading}</rt></ruby>`)
+                if (kuromojiPath[l].pos_detail_1 == "空白") {
+                    // 跳过空白符号
+                }
+                else if (kuromojiPath[l].reading) {
+                    kuromojiDomList.push(`<a href="https://dictionary.goo.ne.jp/srch/all/${kuromojiPath[l].surface_form}/m1u/"><ruby class="known">${kuromojiPath[l].surface_form} <rt>${katakanaToHiragana(kuromojiPath[l].reading)}</rt></ruby></a>`)
                 }
                 else {
-                    kuromojiDomList.push(`<ruby class="unknown">${kuromojiPath[l].surface_form} <rt></rt></ruby>`)
+                    kuromojiDomList.push(`<a href="https://dictionary.goo.ne.jp/srch/all/${kuromojiPath[l].surface_form}/m1u/"><ruby class="unknown">${kuromojiPath[l].surface_form} <rt></rt></ruby></a>`)
                 }
             }
             kuromojiListStr = kuromojiDomList.join('');
@@ -321,13 +332,23 @@
             font-size: 0.9em;
         }
 
-        ruby {
-            margin: 15px;
-            position: relative;
-            
+        .kuromoji-list a {
+            color: blue;
+            text-decoration: none;
         }
 
-        .unknown {
+        .kuromoji-list a:hover {
+            /* 下划线 */
+            text-decoration: underline;
+        }
+
+        .kuromoji-list ruby {
+            margin: 15px;
+            position: relative;
+
+        }
+
+        .kuromoji-list .unknown {
             color: grey;
         }
     </style>
@@ -336,7 +357,7 @@
 
 <body>
     <div id='globalContainer'>
-        <a href="https://github.com/Huifusu/Hanzi2Kanji" class="github-corner" aria-label="View source on GitHub"><svg
+        <a href="https://github.com/Huifusu/Hanzi2KanjiKuromoji" class="github-corner" aria-label="View source on GitHub"><svg
                 width="80" height="80" viewBox="0 0 250 250"
                 style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true">
                 <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
@@ -381,7 +402,7 @@
             }
         </style>
         <div class='title-box'>
-            <h1>中日汉字转换分析</h1>
+            <h1>中日汉字转换・分析</h1>
         </div>
 
         <div class='input-box'>
