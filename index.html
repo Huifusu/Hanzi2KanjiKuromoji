@@ -191,10 +191,10 @@
                     // 跳过空白符号
                 }
                 else if (kuromojiPath[l].reading) {
-                    kuromojiDomList.push(`<a href="https://dictionary.goo.ne.jp/srch/all/${kuromojiPath[l].surface_form}/m1u/"><ruby class="known">${kuromojiPath[l].surface_form} <rt>${katakanaToHiragana(kuromojiPath[l].reading)}</rt></ruby></a>`)
+                    kuromojiDomList.push(`<a href="https://dictionary.goo.ne.jp/srch/all/${kuromojiPath[l].surface_form}/m1u/" target="_blank"><ruby class="known">${kuromojiPath[l].surface_form} <rt>${katakanaToHiragana(kuromojiPath[l].reading)}</rt></ruby></a>`)
                 }
                 else {
-                    kuromojiDomList.push(`<a href="https://dictionary.goo.ne.jp/srch/all/${kuromojiPath[l].surface_form}/m1u/"><ruby class="unknown">${kuromojiPath[l].surface_form} <rt></rt></ruby></a>`)
+                    kuromojiDomList.push(`<a href="https://dictionary.goo.ne.jp/srch/all/${kuromojiPath[l].surface_form}/m1u/" target="_blank"><ruby class="unknown">${kuromojiPath[l].surface_form} <rt></rt></ruby></a>`)
                 }
             }
             kuromojiListStr = kuromojiDomList.join('');
