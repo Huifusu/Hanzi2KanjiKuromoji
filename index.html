@@ -3,7 +3,8 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>中日汉字转换・分析 Kuromoji</title>
+    <meta http-equiv="Cache-Control" content="max-age=3600000000">
+    <title>中日汉字转换・分析・朗读 with Kuromoji</title>
     <link rel="icon" href="" type="image/x-icon" />
     <script src='loadDictionary.js'></script>
     <script src="https://CDN.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -16,15 +17,19 @@
             }); var f = d.getElementsByTagName(s)[0],
                 j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
                     'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
-        })(window, document, 'script', 'dataLayer', 'GTM-WP9NXG47');</script>
+        })(window, document, 'script', 'dataLayer', 'GTM-WP9NXG47');
+    </script>
     <!-- End Google Tag Manager -->
     <script src="kuromoji/build/kuromoji.js"></script>
 
     <!-- Js -->
     <script>
+        // 使用的语音：Nanami  
+        var useVoiceName = "Microsoft Nanami Online (Natural) - Japanese (Japan)"
+        // ===================
+
         // Kuromoji字典初始化
         var DIC_URL = "kuromoji/dict/";
-
         var tokenizer = null;
 
         kuromoji.builder({ dicPath: DIC_URL }).build(function (error, _tokenizer) {
@@ -35,8 +40,60 @@
 
             //加载完成
             document.getElementById('kuromojiList').innerHTML = "<p></p>";
-
+            readInitialization()
         });
+
+        
+
+
+
+        // 检测能否以“Nanami”朗读
+        function isVoiceAvailable(voiceName) {
+            // 检查浏览器是否支持 SpeechSynthesis 接口
+            if ('speechSynthesis' in window) {
+                // 获取可用的朗读者列表
+                const availableVoices = speechSynthesis.getVoices();
+
+                // 查找指定的朗读者
+                const selectedVoice = availableVoices.find(voice => voice.name === voiceName);
+
+                // 返回是否找到特定朗读者的结果
+                if (!!selectedVoice) {
+                    return true
+                }
+                else {
+
+                    
+                    return false
+                }
+            } else {
+                // 浏览器不支持 SpeechSynthesis 接口
+
+                
+                
+                return false;
+            }
+        }
+
+
+        // 朗读
+        function readTextWithVoice(textToRead, voiceName) {
+            // 检查浏览器是否支持朗读功能，并检查是否有指定的朗读者
+            if (isVoiceAvailable(voiceName)) {
+
+                const utterance = new SpeechSynthesisUtterance();
+                utterance.text = textToRead;
+                const availableVoices = speechSynthesis.getVoices();
+                const selectedVoice = availableVoices.find(voice => voice.name === voiceName);
+                utterance.voice = selectedVoice;
+
+                // 开始朗读
+                speechSynthesis.speak(utterance);
+            } else {
+                // 没有找到指定的朗读者或浏览器不支持朗读功能
+                
+            }
+        }
 
         // 片假转平假
         function katakanaToHiragana(katakanaText) {
@@ -67,6 +124,7 @@
 
         // 汉字处理过程
         function trans(ori) {
+            readInitialization()
             var words = window.cinput.value.split('')
             var hexList = new Array();
             for (i = 0; i < words.length; i++) {
@@ -165,10 +223,10 @@
                         let sunicode = scharacter.charCodeAt(0);
                         let shex = "u" + sunicode.toString(16).padStart(4, '0').toUpperCase();
                         if (scharacter == hexList[j].orgkanji) {
-                            domAll.push(`<a class="intrans" href="https://kanji.sljfaq.org/k/${shex}.html">${hexList[j].all[k]}</a>`)
+                            domAll.push(`<a class="intrans" href="https://kanji.sljfaq.org/k/${shex}.html" target="_blank">${hexList[j].all[k]}</a>`)
                         }
                         else {
-                            domAll.push(`<a class="trans" href="https://kanji.sljfaq.org/k/${shex}.html">${hexList[j].all[k]}</a>`)
+                            domAll.push(`<a class="trans" href="https://kanji.sljfaq.org/k/${shex}.html" target="_blank">${hexList[j].all[k]}</a>`)
                         }
 
                     }
@@ -230,6 +288,20 @@
                 copy(window.jinput.value, false, 'click');
             }
         }
+
+        function readInitialization() {
+            var voiceAvailable = isVoiceAvailable(useVoiceName);
+            var buttonDom = '<button type="button" onclick="readTextWithVoice(window.jinput.value, useVoiceName)"><span>朗读</span></button>';
+            if (voiceAvailable) {
+                document.getElementById('readButton').innerHTML = buttonDom;
+                return true
+            }
+        }
+    
+        while (!!readInitialization()) {
+
+        }
+
     </script>
     <style>
         html {
@@ -350,14 +422,39 @@
         .kuromoji-list .unknown {
             color: grey;
         }
+
+        .read-button {
+            position: absolute;
+            left: 50%;
+            top: 85%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5em;
+        }
+
+        .read-button button {
+            background-color: #ffffff;
+            border: 1px solid #e5e5e5;
+            border-radius: 4px;
+            color: black;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+        }
+
+
+        .read-button button:hover {
+            border: 1px solid #8c8c8c;
+        }
     </style>
 </head>
 
 
 <body>
     <div id='globalContainer'>
-        <a href="https://github.com/Huifusu/Hanzi2KanjiKuromoji" class="github-corner" aria-label="View source on GitHub"><svg
-                width="80" height="80" viewBox="0 0 250 250"
+        <a href="https://github.com/Huifusu/Hanzi2KanjiKuromoji" class="github-corner"
+            aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250"
                 style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true">
                 <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
                 <path
@@ -401,7 +498,7 @@
             }
         </style>
         <div class='title-box'>
-            <h1>中日汉字转换・分析</h1>
+            <h1>中日汉字转换・分析・朗读</h1>
         </div>
 
         <div class='input-box'>
@@ -415,8 +512,11 @@
         <div class="kanji-list" id="kanjiList" lang="ja">
             <p></p>
         </div>
-        <div class="kuromoji-list" id="kuromojiList" lang="ja">
+        <div class="kuromoji-list" id="kuromojiList">
             <p>Kuromoji字典加载中...</p>
+        </div>
+        <div class="read-button" id="readButton">
+            
         </div>
     </div>
 
